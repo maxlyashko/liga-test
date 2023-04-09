@@ -18,7 +18,7 @@ public class QuestionController {
     }
 
     @GetMapping("/top")
-    @Operation(description = "An endpoint to extract top 5 questions by length from database")
+    @Operation(description = "An endpoint to extract top X questions by length from database")
     public List<Question> getTop (@RequestParam(value = "limit", required = false) int limit) {
         return questionService.findOrderedByLengthLimitedTo (limit );
     }
