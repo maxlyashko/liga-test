@@ -1,5 +1,7 @@
 package ua.lyashko.app.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public QuestionServiceImpl ( QuestionRepository questionRepository ) {
         this.questionRepository = questionRepository;
@@ -56,9 +61,10 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<Question> findTop5ByLength () {
-        return questionRepository.findTop5ByOrderByLengthDesc ( );
+    public List<Question> findOrderedByLengthLimitedTo ( int limit ) {
+        return entityManager.createQuery ( "SELECT q FROM question q ORDER BY q.length DESC", Question.class).setMaxResults ( limit ).getResultList ();
     }
+
 
     @Override
     public List<SimilarQuestionModel> getSimilarQuestionsList ( String target , int quantity ) {

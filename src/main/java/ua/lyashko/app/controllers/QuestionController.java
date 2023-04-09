@@ -19,8 +19,8 @@ public class QuestionController {
 
     @GetMapping("/top")
     @Operation(description = "An endpoint to extract top 5 questions by length from database")
-    public List<Question> getTop () {
-        return questionService.findTop5ByLength ( );
+    public List<Question> getTop (@RequestParam(value = "limit", required = false) int limit) {
+        return questionService.findOrderedByLengthLimitedTo (limit );
     }
 
     @PostMapping("/similar")

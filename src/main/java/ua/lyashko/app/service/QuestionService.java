@@ -11,7 +11,7 @@ public interface QuestionService {
 
     void saveQuestion ( Question question );
 
-    List<Question> findTop5ByLength ();
+    List<Question> findOrderedByLengthLimitedTo (int limit);
 
     List<SimilarQuestionModel> getSimilarQuestionsList ( String target , int quantity );
 }
