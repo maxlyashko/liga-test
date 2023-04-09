@@ -4,44 +4,33 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ua.lyashko.app.entity.Question;
 import ua.lyashko.app.model.SimilarQuestionModel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
 @Data
-public class MyThread extends Thread {
+public class QuestionServiceThread extends Thread {
 
     private Question q;
     private Question question;
-    private List<SimilarQuestionModel> modelList;
+    private SimilarQuestionModel model = new SimilarQuestionModel ( );
 
     private int findSimilarity ( Question q1 , Question q2 ) {
-        int similarity = 0;
         List<String> q1List = getPreparedList ( q1 );
         List<String> q2List = getPreparedList ( q2 );
-        List<String> temp = new ArrayList<> ( );
         if (Objects.equals ( q1List.get ( 0 ) , q2List.get ( 0 ) )) {
-            q2List.stream ( )
+            return Math.toIntExact ( q2List.stream ( )
                     .filter ( q1List::contains )
-                    .forEach ( temp::add );
-            similarity = temp.size ( );
+                    .count ( ) );
         }
-        return similarity;
-    }
-
-
-    private void addToModelList ( SimilarQuestionModel model ) {
-        if (model.getSimilarity ( ) > 0) {
-            modelList.add ( model );
-        }
+        return 0;
     }
 
     private List<String> getPreparedList ( @NotNull Question q ) {
@@ -53,9 +42,12 @@ public class MyThread extends Thread {
 
     @Override
     public void run () {
-        SimilarQuestionModel model = new SimilarQuestionModel ( );
         model.setDescription ( q.getDescription ( ) );
         model.setSimilarity ( findSimilarity ( question , q ) );
-        addToModelList ( model );
+    }
+
+    public QuestionServiceThread ( Question q , Question question ) {
+        this.q = q;
+        this.question = question;
     }
 }

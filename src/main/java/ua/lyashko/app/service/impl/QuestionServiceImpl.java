@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ua.lyashko.app.entity.Question;
 import ua.lyashko.app.model.SimilarQuestionModel;
 import ua.lyashko.app.repository.QuestionRepository;
-import ua.lyashko.app.service.MyThread;
 import ua.lyashko.app.service.QuestionService;
+import ua.lyashko.app.service.QuestionServiceThread;
 
 import java.util.*;
 
@@ -29,10 +29,17 @@ public class QuestionServiceImpl implements QuestionService {
     private void setSimilarity ( @NotNull Question question ,
                                  @NotNull List<Question> questions ,
                                  @NotNull List<SimilarQuestionModel> modelList ) {
+        List<QuestionServiceThread> threads = new ArrayList<> ( );
         for (Question q : questions) {
-            MyThread myThread = new MyThread ( q , question , modelList );
-            myThread.start ( );
-            myThread.join ( );
+            QuestionServiceThread thread = new QuestionServiceThread ( q , question );
+            thread.start ( );
+            threads.add ( thread );
+        }
+        for (QuestionServiceThread th : threads) {
+            th.join ( );
+            if (th.getModel ( ).getSimilarity ( ) > 0) {
+                modelList.add ( th.getModel ( ) );
+            }
         }
     }
 
